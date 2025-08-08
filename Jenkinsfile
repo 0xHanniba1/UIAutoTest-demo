@@ -7,7 +7,7 @@ pipeline {
                 echo '清理旧报告并执行测试...'
                 sh '''
                     cd ${WORKSPACE}
-                    rm -rf allure-results
+                    rm -rf reports/allure-results
                     source venv/bin/activate
                     python -m pytest --alluredir=reports/allure-results
                 '''
