@@ -4,24 +4,35 @@ pipeline {
     stages {
         stage('环境准备') {
             steps {
-                echo '开始准备测试环境...'
-                // 安装依赖
-                sh 'pip3 install -r requirements.txt'
+                echo '检查并安装依赖...'
+                script {
+                    // 检查是否已存在虚拟环境
+                    if (!fileExists('venv')) {
+                        sh '''
+                            python3 -m venv venv
+                            . venv/bin/activate
+                            pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
+                        '''
+                    } else {
+                        echo '虚拟环境已存在，跳过安装'
+                    }
+                }
             }
         }
 
         stage('运行测试') {
             steps {
-                echo '开始执行自动化测试...'
-                sh 'python3 -m pytest --alluredir=reports/allure-results'
+                echo '执行自动化测试...'
+                sh '''
+                    . venv/bin/activate
+                    python -m pytest --alluredir=reports/allure-results --clean-alluredir
+                '''
             }
         }
     }
 
     post {
         always {
-            echo '测试执行完成'
-            // 发布 Allure 报告
             allure([
                 includeProperties: false,
                 jdk: '',
