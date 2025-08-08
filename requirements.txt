@@ -1,0 +1,4 @@
+allure_python_commons==2.15.0
+loguru==0.7.3
+pytest==8.4.1
+selenium==4.34.2
