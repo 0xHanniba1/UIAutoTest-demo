@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import allure
 import pytest
 from selenium import webdriver
 from src.pages.login_page import LoginPage
@@ -20,3 +21,18 @@ def login(driver):
     login_page = LoginPage(driver)
     login_page.login(Config.USERNAME, Config.PASSWORD)
     return driver
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """失败自动截图"""
+    outcome = yield
+    rep = outcome.get_result()
+
+    if rep.when == "call" and rep.failed:
+        driver = item.funcargs.get("driver")
+        if driver:
+            allure.attach(
+                driver.get_screenshot_as_png(),
+                name="失败截图",
+                attachment_type=allure.attachment_type.PNG
+            )
