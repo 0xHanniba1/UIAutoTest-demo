@@ -4,11 +4,12 @@ pipeline {
     stages {
         stage('运行测试') {
             steps {
-                echo '激活虚拟环境并执行测试...'
+                echo '清理旧报告并执行测试...'
                 sh '''
                     cd ${WORKSPACE}
+                    rm -rf allure-results
                     source venv/bin/activate
-                    python -m pytest --alluredir=allure-results --clean-alluredir
+                    python -m pytest --alluredir=reports/allure-results
                 '''
             }
         }
@@ -22,7 +23,7 @@ pipeline {
                 jdk: '',
                 properties: [],
                 reportBuildPolicy: 'ALWAYS',
-                results: [[path: 'allure-results']]
+                results: [[path: 'reports/allure-results']]
             ])
         }
     }
